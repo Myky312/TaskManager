@@ -15,7 +15,12 @@ export class TasksService {
 
   async getTasks(userId: string) {
     // console.log('userId', userId);
-    return this.prisma.task.findMany({ where: { userId } });
+    console.log('TasksService getTasks userId:', userId);
+    return this.prisma.task.findMany({
+      where: {
+        userId: userId,
+      },
+    });
   }
 
   async getTaskById(id: string, userId: string) {

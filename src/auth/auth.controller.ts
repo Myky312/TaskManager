@@ -1,17 +1,27 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
-import { User } from '../users/entities/user.entity';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { AuthGuard } from './auth.guard';
 import {
   ApiTags,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiUnauthorizedResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { AuthGuard } from './guards/auth.guard'; //  Import your custom AuthGuard
+import { User } from '../users/entities/user.entity';
 
-@ApiTags('auth') // Add tags for grouping in Swagger UI
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -26,17 +36,17 @@ export class AuthController {
   }
 
   @Post('login')
-  @ApiOkResponse({
-    description: 'User logged in successfully.',
-    type: LoginDto,
-  })
-  async login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'User logged in successfully.' })
+  @ApiBadRequestResponse({ description: 'Invalid input data.' })
+  @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
 
   @Post('profile')
   @UseGuards(AuthGuard)
-  @ApiBearerAuth() // Require bearer token for this endpoint
+  @ApiBearerAuth()
   @ApiOkResponse({ description: 'User profile.', type: User })
   getProfile(@Req() req: Request & { user: any }) {
     return req.user as User;

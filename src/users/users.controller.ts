@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,18 +18,23 @@ import {
   ApiNotFoundResponse,
   ApiBadRequestResponse,
   ApiInternalServerErrorResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UserDto } from './dto/user.dto';
+import { AdminGuard } from '../auth/guards/admin.quard';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @ApiTags('users')
 @Controller('users')
+@UseGuards(AuthGuard, AdminGuard)
+@ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @ApiCreatedResponse({
     description: 'The user has been successfully created.',
-    type: UserDto, // Changed to UserDto
+    type: UserDto,
   })
   @ApiBadRequestResponse({ description: 'Invalid input data.' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error.' })
@@ -39,7 +45,7 @@ export class UsersController {
   @Get()
   @ApiOkResponse({
     description: 'List of users.',
-    type: [UserDto], // Changed to [UserDto]
+    type: [UserDto],
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error.' })
   findAll() {
@@ -47,7 +53,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ description: 'User details.', type: UserDto }) // Changed to UserDto
+  @ApiOkResponse({ description: 'User details.', type: UserDto })
   @ApiNotFoundResponse({ description: 'User not found.' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error.' })
   findOne(@Param('id') id: string) {
@@ -57,7 +63,7 @@ export class UsersController {
   @Patch(':id')
   @ApiOkResponse({
     description: 'User updated successfully.',
-    type: UserDto, // Changed to UserDto
+    type: UserDto,
   })
   @ApiNotFoundResponse({ description: 'User not found.' })
   @ApiBadRequestResponse({ description: 'Invalid input data.' })

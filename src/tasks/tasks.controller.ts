@@ -12,7 +12,7 @@ import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { User } from '../common/decorators/user.decorator';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -40,6 +40,7 @@ export class TasksController {
   @UseGuards(AuthGuard)
   @ApiOkResponse({ description: 'List of tasks.', type: [CreateTaskDto] })
   findAll(@User('id') userId: string) {
+    console.log('TasksController findAll userId:', userId);
     return this.tasksService.getTasks(userId);
   }
 

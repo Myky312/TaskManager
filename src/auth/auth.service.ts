@@ -1,9 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { Role } from 'src/users/entities/user.entity';
+import { env } from 'process';
 
 @Injectable()
 export class AuthService {
@@ -13,28 +19,54 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const hashedPassword: string = await bcrypt.hash(dto.password, 10);
-    const exist = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    const { email, password, role = Role.USER } = dto; // Default to USER, and get role
+
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email },
     });
-    if (exist) {
-      throw new UnauthorizedException('User already exists');
+    if (existingUser) {
+      throw new BadRequestException('Email already in use');
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.prisma.user.create({
-      data: { email: dto.email, password: hashedPassword },
+      data: {
+        email,
+        password: hashedPassword,
+        role,
+      },
     });
-    return { message: 'User registered successfully', userId: user.id };
+    return { id: user.id, email: user.email };
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
-    if (!user || !(await bcrypt.compare(dto.password, user.password))) {
+    const { email, password } = dto;
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    // console.log(user);
+
+    if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const token = this.jwtService.sign({ id: user.id, email: user.email });
-    return { access_token: token };
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Include the user's role in the payload
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role, // Add the role here
+    };
+
+    const token = await this.jwtService.signAsync(payload, {
+      secret: env.JWT_SECRET,
+    });
+
+    // console.log(JSON.stringify(payload) + ' Token:' + token);
+    return {
+      access_token: token,
+    };
   }
 }
