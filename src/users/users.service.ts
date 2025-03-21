@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +14,7 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.prisma.user.findMany({ include: { tasks: true } });
+    return this.prisma.user.findMany({ include: { tasks: false } });
   }
 
   async findOne(id: string) {
