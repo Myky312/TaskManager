@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { Role } from 'src/users/entities/user.entity';
+import { Role } from '../users/entities/user.entity';
 import { env } from 'process';
 
 @Injectable()

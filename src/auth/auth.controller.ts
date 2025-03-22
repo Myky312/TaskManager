@@ -6,6 +6,7 @@ import {
   HttpStatus,
   UseGuards,
   Req,
+  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -44,7 +45,7 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Post('profile')
+  @Get('profile')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ description: 'User profile.', type: User })

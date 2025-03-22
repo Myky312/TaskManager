@@ -62,9 +62,6 @@ export class TasksController {
         { [query['sort[field]']]: query['sort[order]'] || 'asc' }
       : undefined;
 
-    console.log('🚀 Final Filters:', filters);
-    console.log('🚀 Final OrderBy:', sort);
-
     return this.tasksService.getFilteredTasks(userId, filters, sort);
   }
 

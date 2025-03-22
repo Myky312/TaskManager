@@ -1,6 +1,6 @@
 import { IsOptional, IsString, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { TaskStatus } from '@prisma/client';
+import { TaskStatus } from '../entities/task.entity';
 
 export class UpdateTaskDto {
   @ApiProperty({ required: false })
