@@ -7,6 +7,7 @@ import {
   Delete,
   Patch,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -19,6 +20,8 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger'; // Import Swagger decorators
+// import { TaskStatus } from './entities/task.entity';
+// import { SortQueryDto } from './dto/sort-query.dto';
 
 @ApiTags('tasks') // Add tags for grouping in Swagger UI
 @Controller('tasks')
@@ -40,8 +43,29 @@ export class TasksController {
   @UseGuards(AuthGuard)
   @ApiOkResponse({ description: 'List of tasks.', type: [CreateTaskDto] })
   findAll(@User('id') userId: string) {
-    console.log('TasksController findAll userId:', userId);
+    // console.log('TasksController findAll userId:', userId);
     return this.tasksService.getTasks(userId);
+  }
+
+  @Get('filtered')
+  @UseGuards(AuthGuard)
+  @ApiOkResponse({
+    description: 'Filtered list of tasks.',
+    type: [CreateTaskDto],
+  })
+  async getFiltered(@Query() query: any, @User('id') userId: string) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const filters = { status: query.status };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const sort = query['sort[field]']
+      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        { [query['sort[field]']]: query['sort[order]'] || 'asc' }
+      : undefined;
+
+    console.log('🚀 Final Filters:', filters);
+    console.log('🚀 Final OrderBy:', sort);
+
+    return this.tasksService.getFilteredTasks(userId, filters, sort);
   }
 
   @Get(':id')

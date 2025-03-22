@@ -19,7 +19,7 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const { email, password, role = Role.USER } = dto; // Default to USER, and get role
+    const { email, password, role = Role.USER } = dto;
 
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
@@ -57,7 +57,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      role: user.role, // Add the role here
+      role: user.role,
     };
 
     const token = await this.jwtService.signAsync(payload, {

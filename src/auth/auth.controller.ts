@@ -18,7 +18,7 @@ import {
   ApiUnauthorizedResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { AuthGuard } from './guards/auth.guard'; //  Import your custom AuthGuard
+import { AuthGuard } from './guards/auth.guard';
 import { User } from '../users/entities/user.entity';
 
 @ApiTags('auth')

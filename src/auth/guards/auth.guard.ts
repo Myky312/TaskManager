@@ -28,9 +28,9 @@ export class AuthGuard implements CanActivate {
         secret: env.JWT_SECRET,
       });
       //  Attach the user payload to the request object.  This is CRUCIAL for accessing user data in your controllers.
-      console.log('AuthGuard payload:', payload); //  Add this line
+      // console.log('AuthGuard payload:', payload);
       request.user = payload;
-      console.log('AuthGuard request.user:', request.user);
+      // console.log('AuthGuard request.user:', request.user);
       //  console.log(payload);  //  Good for debugging, remove in production.
     } catch {
       throw new UnauthorizedException();

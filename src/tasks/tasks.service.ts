@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+// import { TaskStatus } from './entities/task.entity';
 
 @Injectable()
 export class TasksService {
@@ -15,11 +16,18 @@ export class TasksService {
 
   async getTasks(userId: string) {
     // console.log('userId', userId);
-    console.log('TasksService getTasks userId:', userId);
+    // console.log('TasksService getTasks userId:', userId);
     return this.prisma.task.findMany({
       where: {
         userId: userId,
       },
+    });
+  }
+
+  async getFilteredTasks(userId: string, filters: any, orderBy?: any) {
+    return this.prisma.task.findMany({
+      where: { userId, ...filters },
+      orderBy,
     });
   }
 

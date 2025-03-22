@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UserDto } from './dto/user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -25,7 +26,22 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({ where: { id }, data: updateUserDto });
+    // Check if the password is being updated
+    if (updateUserDto.password) {
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(updateUserDto.password, 10);
+      // Update the user with the hashed password
+      return this.prisma.user.update({
+        where: { id },
+        data: { ...updateUserDto, password: hashedPassword },
+      });
+    } else {
+      // If the password is not being updated, update the user with the provided data
+      return this.prisma.user.update({
+        where: { id },
+        data: updateUserDto,
+      });
+    }
   }
 
   async remove(id: string) {
